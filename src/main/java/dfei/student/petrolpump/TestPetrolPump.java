@@ -8,6 +8,17 @@ package dfei.student.petrolpump;
  *
  * @author 20231437
  */
+
 public class TestPetrolPump {
+    private PetrolPump Pump;
     
+    TestPetrolPump(PetrolPump Pump) {
+        this.Pump = Pump;        
+    }
+    public void startTesting() {       
+        //Running test
+        Pump.startPumping();
+        //Adding 1000L of Fuel
+        Pump.addFuel(1000);
+    }    
 }

@@ -5,71 +5,167 @@
 
 package dfei.student.petrolpump;
 import java.text.NumberFormat;
+import java.util.Scanner;
 /**
  *
  * @author 20231437
  */
 public class PetrolPump {
     private double petrolPrice;
-    private double currentPetrol;
-    private double minLevelPetrol;
+    private double currentPetrolLevel;
+    private double minPetrolLevel;
     private String petrolType;
+
+    //Initializing Input/Output
+    private Scanner Input = new Scanner(System.in);  
     
+    //Constructor
     public PetrolPump() {
         this.petrolPrice = 0;
-        this.currentPetrol = 0;
-        this.minLevelPetrol = 0;
+        this.currentPetrolLevel = 0;
+        this.minPetrolLevel = 0;
         this.petrolType = "";
     }
+    //Overloaded Constructor
     public PetrolPump(double petrolPrice, double currentPetrol, double minLevelPetrol, String petrolType) {
         this.petrolPrice = petrolPrice;
-        this.currentPetrol = currentPetrol;
-        this.minLevelPetrol = minLevelPetrol;
+        this.currentPetrolLevel = currentPetrol;
+        this.minPetrolLevel = minLevelPetrol;
         this.petrolType = petrolType;
     }
-    public double fillCarFromPump(double givenPetrol) {
-        double finalPrice = 0;
-        if (this.currentPetrol - givenPetrol >= minLevelPetrol) {           
-            this.currentPetrol -= givenPetrol;
-            finalPrice = givenPetrol * this.petrolPrice;
-        }        
-        return finalPrice;
+    public void fillCarFromPump(double givenPetrol) {
+        double finalPrice;     
+        
+        //Make calculation in the Pump
+        this.currentPetrolLevel -= givenPetrol;
+        finalPrice = givenPetrol * this.petrolPrice;
+        if(this.useATM(finalPrice, givenPetrol)) {               
+            this.useSeparatorPrint();
+            try { 
+                long numMillisecondsToSleep = 1500; // 5 seconds 
+                Thread.sleep(numMillisecondsToSleep);                 
+            } catch (InterruptedException e) {                          
+                 System.out.println("Something wrong with Pump, ask manager for help!");
+            } 
+            System.out.println("Fueling finished");
+            this.useSeparatorPrint();
+            System.out.println("Amount of " + this.petrolType + " petrol left in a pump after fueling: " + this.availablePetrolLevel());
+        }
+    }
+    public boolean useATM(double price, double givenPetrol) {
+        boolean status = false;         
+        
+        //Declare input variable
+        double money = 0;
+        //Show message about succesful purchase with amount of Litres and Price  
+        this.useSeparatorPrint();
+        System.out.println("You need to pay " +  formatPrice(price) + " for " + givenPetrol + " litres of Fuel");
+        //Input customer data
+        while(money == 0) {                 
+            System.out.print("Pay " + formatPrice(price) + " for your fueling: ");    
+            try {
+                money = Double.parseDouble(this.Input.next());
+            } catch(NumberFormatException e) {
+                System.out.println("We accept only £, $ or €"); 
+            } 
+            if(price > money) {
+                money = 0;
+                System.out.println("You don't have enough funds to cover your fueling");
+            } else {                
+                this.useSeparatorPrint();
+                System.out.println("Payment succesful. Your change is " + formatPrice(money - price));
+                this.useSeparatorPrint();
+                System.out.println("Fueling started.");
+                status = true;
+            }
+        }                
+        return status;
+    } 
+    public boolean checkPumpStayFilled(double givenPetrol) {       
+        boolean status = false;
+        
+        if (this.availablePetrolLevel() - givenPetrol >= 0) {           
+            status = true;
+        }
+        return status;
+    }
+    public void useSeparatorPrint() {        
+        System.out.println("**********");
     }
     public void addFuel(double addPetrol) {
-        this.currentPetrol += addPetrol;
+        this.currentPetrolLevel += addPetrol;        
+        System.out.println("Filling amount of petrol " + addPetrol);
+        //Show amount of petrol available after filling Pump               
+        this.useSeparatorPrint();
+        System.out.println("Amount of " + this.petrolType + " petrol in a pump after re-filling: " + this.availablePetrolLevel());
     }
     
     public double getPetrolPrice() {
         return this.petrolPrice;
-    }
-    
-    public double currentPetrol() {
-        return this.currentPetrol;
-    }
-    
-    public double minLevelPetrol() {
-        return this.minLevelPetrol;
-    }
-    
-    public String petrolType() {
-        return this.petrolType;
-    }
+    }    
     
     public void setPetrolPrice(double PetrolPrice) {
         this.petrolPrice = PetrolPrice;
     }
     
     public void setMinLevelPetrol(double minLevelPetrol) {
-        this.minLevelPetrol = minLevelPetrol;
+        this.minPetrolLevel = minLevelPetrol;
+    }    
+    
+    public double getMinLevelPetrol() {
+        return this.minPetrolLevel;
     }
     
-    public static void main(String[] args) {
+    public double currentPetrolLevel() {
+        return this.currentPetrolLevel;
+    }
+    
+    public double availablePetrolLevel() {
+        return this.currentPetrolLevel - this.minPetrolLevel;
+    }
+    
+    public String petrolType() {
+        return this.petrolType;
+    }
+    
+    public String formatPrice(double price) {
+        //Declare price formatter
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
         
-        double operationPrice = 0;
-        PetrolPump todayPump = new PetrolPump(0.75, 20000, 2, "Unleaded");
-        operationPrice = todayPump.fillCarFromPump(25);
         //Operation price output
-        System.out.println(currencyFormatter.format(operationPrice));
+        //System.out.println(currencyFormatter.format(price));
+        
+        return currencyFormatter.format(price);
+    }
+    public void startPumping() {              
+        //Show welcome message
+        System.out.println("Welcome to Petrol Station 'Harakiri' at Groove Street, Los Angeles");
+        //Show amount of petrol available before pump                
+        this.useSeparatorPrint();
+        System.out.println("Amount of " + this.petrolType + " petrol in a pump before fueling " + this.availablePetrolLevel());
+        
+        //Declare input variable
+        double fuelBuyAmount = 0;
+                
+        //Input customer data
+        while(fuelBuyAmount == 0) {      
+            boolean checkAvailability = false;
+            while(checkAvailability == false) {                     
+                this.useSeparatorPrint();
+                System.out.print("Amount of " + this.petrolType + " petrol you wish to purchase: ");    
+                try {
+                    fuelBuyAmount = Double.parseDouble(this.Input.next());
+                } catch(NumberFormatException e) {
+                    System.out.println("Put number in litres"); 
+                } 
+                if(this.checkPumpStayFilled(fuelBuyAmount) == false) {
+                    System.out.println("You cannot get more petrol than the minimum petrol quantity.");  
+                } else {
+                    checkAvailability = true;
+                }
+            }
+        }        
+        //Trying to buy Fuel          
+        this.fillCarFromPump(fuelBuyAmount);
     }
 }
