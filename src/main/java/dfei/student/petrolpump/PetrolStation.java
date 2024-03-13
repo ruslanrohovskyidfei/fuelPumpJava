@@ -11,6 +11,6 @@ public class PetrolStation {
     public static void main(String[] args) {       
         PetrolPump Pump = new PetrolPump(0.75, 20000, 2, "Unleaded"); 
         TestPetrolPump TestPump = new TestPetrolPump(Pump);
-        TestPump.startOperation();
+        TestPump.startTesting();
     }
 }

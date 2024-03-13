@@ -5,6 +5,7 @@
 
 package dfei.student.petrolpump;
 import java.text.NumberFormat;
+import java.util.Scanner;
 /**
  *
  * @author 20231437
@@ -14,6 +15,9 @@ public class PetrolPump {
     private double currentPetrolLevel;
     private double minPetrolLevel;
     private String petrolType;
+
+    //Initializing Input/Output
+    private Scanner Input = new Scanner(System.in);  
     
     //Constructor
     public PetrolPump() {
@@ -29,37 +33,71 @@ public class PetrolPump {
         this.minPetrolLevel = minLevelPetrol;
         this.petrolType = petrolType;
     }
-    public double fillCarFromPump(int givenPetrol) {
-        double finalPrice = 0;
-        String message;        
-        if(this.checkPumpStayFilled(givenPetrol) && this.checkPumpAmount(givenPetrol)) {            
-            this.currentPetrolLevel -= givenPetrol;
-            finalPrice = givenPetrol * this.petrolPrice;
-            message = "You need to pay " +  formatPrice(finalPrice) + " for " + givenPetrol + " litres of Fuel";
-        } else {
-            message = "Pump is not having those amount of Fuel";
+    public void fillCarFromPump(double givenPetrol) {
+        double finalPrice;     
+        
+        //Make calculation in the Pump
+        this.currentPetrolLevel -= givenPetrol;
+        finalPrice = givenPetrol * this.petrolPrice;
+        if(this.useATM(finalPrice, givenPetrol)) {               
+            this.useSeparatorPrint();
+            try { 
+                long numMillisecondsToSleep = 1500; // 5 seconds 
+                Thread.sleep(numMillisecondsToSleep);                 
+            } catch (InterruptedException e) {                          
+                 System.out.println("Something wrong with Pump, ask manager for help!");
+            } 
+            System.out.println("Fueling finished");
+            this.useSeparatorPrint();
+            System.out.println("Amount of " + this.petrolType + " petrol left in a pump after fueling: " + this.availablePetrolLevel());
         }
-        System.out.print(message);
-        return finalPrice;
     }
-    public boolean checkPumpStayFilled(int givenPetrol) {       
+    public boolean useATM(double price, double givenPetrol) {
+        boolean status = false;         
+        
+        //Declare input variable
+        double money = 0;
+        //Show message about succesful purchase with amount of Litres and Price  
+        this.useSeparatorPrint();
+        System.out.println("You need to pay " +  formatPrice(price) + " for " + givenPetrol + " litres of Fuel");
+        //Input customer data
+        while(money == 0) {                 
+            System.out.print("Pay " + formatPrice(price) + " for your fueling: ");    
+            try {
+                money = Double.parseDouble(this.Input.next());
+            } catch(NumberFormatException e) {
+                System.out.println("We accept only £, $ or €"); 
+            } 
+            if(price > money) {
+                money = 0;
+                System.out.println("You don't have enough funds to cover your fueling");
+            } else {                
+                this.useSeparatorPrint();
+                System.out.println("Payment succesful. Your change is " + formatPrice(money - price));
+                this.useSeparatorPrint();
+                System.out.println("Fueling started.");
+                status = true;
+            }
+        }                
+        return status;
+    } 
+    public boolean checkPumpStayFilled(double givenPetrol) {       
         boolean status = false;
         
-        if (this.currentPetrolLevel - givenPetrol >= minPetrolLevel) {           
+        if (this.availablePetrolLevel() - givenPetrol >= 0) {           
             status = true;
         }
         return status;
     }
-    public boolean checkPumpAmount(int givenPetrol) {       
-        boolean status = false;
-        
-        if (this.currentPetrolLevel > givenPetrol) {           
-            status = true;
-        } 
-        return status;
+    public void useSeparatorPrint() {        
+        System.out.println("**********");
     }
     public void addFuel(double addPetrol) {
-        this.currentPetrolLevel += addPetrol;
+        this.currentPetrolLevel += addPetrol;        
+        System.out.println("Filling amount of petrol " + addPetrol);
+        //Show amount of petrol available after filling Pump               
+        this.useSeparatorPrint();
+        System.out.println("Amount of " + this.petrolType + " petrol in a pump after re-filling: " + this.availablePetrolLevel());
     }
     
     public double getPetrolPrice() {
@@ -72,8 +110,7 @@ public class PetrolPump {
     
     public void setMinLevelPetrol(double minLevelPetrol) {
         this.minPetrolLevel = minLevelPetrol;
-    }
-    
+    }    
     
     public double getMinLevelPetrol() {
         return this.minPetrolLevel;
@@ -81,6 +118,10 @@ public class PetrolPump {
     
     public double currentPetrolLevel() {
         return this.currentPetrolLevel;
+    }
+    
+    public double availablePetrolLevel() {
+        return this.currentPetrolLevel - this.minPetrolLevel;
     }
     
     public String petrolType() {
@@ -92,8 +133,39 @@ public class PetrolPump {
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
         
         //Operation price output
-        System.out.println(currencyFormatter.format(price));
+        //System.out.println(currencyFormatter.format(price));
         
         return currencyFormatter.format(price);
+    }
+    public void startPumping() {              
+        //Show welcome message
+        System.out.println("Welcome to Petrol Station 'Harakiri' at Groove Street, Los Angeles");
+        //Show amount of petrol available before pump                
+        this.useSeparatorPrint();
+        System.out.println("Amount of " + this.petrolType + " petrol in a pump before fueling " + this.availablePetrolLevel());
+        
+        //Declare input variable
+        double fuelBuyAmount = 0;
+                
+        //Input customer data
+        while(fuelBuyAmount == 0) {      
+            boolean checkAvailability = false;
+            while(checkAvailability == false) {                     
+                this.useSeparatorPrint();
+                System.out.print("Amount of " + this.petrolType + " petrol you wish to purchase: ");    
+                try {
+                    fuelBuyAmount = Double.parseDouble(this.Input.next());
+                } catch(NumberFormatException e) {
+                    System.out.println("Put number in litres"); 
+                } 
+                if(this.checkPumpStayFilled(fuelBuyAmount) == false) {
+                    System.out.println("You cannot get more petrol than the minimum petrol quantity.");  
+                } else {
+                    checkAvailability = true;
+                }
+            }
+        }        
+        //Trying to buy Fuel          
+        this.fillCarFromPump(fuelBuyAmount);
     }
 }
