@@ -33,6 +33,39 @@ public class PetrolPump {
         this.minPetrolLevel = minLevelPetrol;
         this.petrolType = petrolType;
     }
+
+    public void printSeparator() {
+        System.out.println("**********");
+    }
+
+    public double getPetrolPrice() {
+        return this.petrolPrice;
+    }
+
+    public void setPetrolPrice(double PetrolPrice) {
+        this.petrolPrice = PetrolPrice;
+    }
+
+    public void setMinLevelPetrol(double minLevelPetrol) {
+        this.minPetrolLevel = minLevelPetrol;
+    }
+
+    public double getMinLevelPetrol() {
+        return this.minPetrolLevel;
+    }
+
+    public double currentPetrolLevel() {
+        return this.currentPetrolLevel;
+    }
+
+    public double availablePetrolLevel() {
+        return this.currentPetrolLevel - this.minPetrolLevel;
+    }
+
+    public String petrolType() {
+        return this.petrolType;
+    }
+
     public void fillCarFromPump(double givenPetrol) {
         double finalPrice;     
         
@@ -40,7 +73,7 @@ public class PetrolPump {
         this.currentPetrolLevel -= givenPetrol;
         finalPrice = givenPetrol * this.petrolPrice;
         if(this.useATM(finalPrice, givenPetrol)) {               
-            this.useSeparatorPrint();
+            this.printSeparator();
             try { 
                 long numMillisecondsToSleep = 1500; // 5 seconds 
                 Thread.sleep(numMillisecondsToSleep);                 
@@ -48,7 +81,7 @@ public class PetrolPump {
                  System.out.println("Something wrong with Pump, ask manager for help!");
             } 
             System.out.println("Fueling finished");
-            this.useSeparatorPrint();
+            this.printSeparator();
             System.out.println("Amount of " + this.petrolType + " petrol left in a pump after fueling: " + this.availablePetrolLevel());
         }
     }
@@ -58,7 +91,7 @@ public class PetrolPump {
         //Declare input variable
         double money = 0;
         //Show message about succesful purchase with amount of Litres and Price  
-        this.useSeparatorPrint();
+        this.printSeparator();
         System.out.println("You need to pay " +  formatPrice(price) + " for " + givenPetrol + " litres of Fuel");
         //Input customer data
         while(money == 0) {                 
@@ -72,9 +105,9 @@ public class PetrolPump {
                 money = 0;
                 System.out.println("You don't have enough funds to cover your fueling");
             } else {                
-                this.useSeparatorPrint();
+                this.printSeparator();
                 System.out.println("Payment succesful. Your change is " + formatPrice(money - price));
-                this.useSeparatorPrint();
+                this.printSeparator();
                 System.out.println("Fueling started.");
                 status = true;
             }
@@ -89,43 +122,12 @@ public class PetrolPump {
         }
         return status;
     }
-    public void useSeparatorPrint() {        
-        System.out.println("**********");
-    }
     public void addFuel(double addPetrol) {
         this.currentPetrolLevel += addPetrol;        
         System.out.println("Filling amount of petrol " + addPetrol);
         //Show amount of petrol available after filling Pump               
-        this.useSeparatorPrint();
+        this.printSeparator();
         System.out.println("Amount of " + this.petrolType + " petrol in a pump after re-filling: " + this.availablePetrolLevel());
-    }
-    
-    public double getPetrolPrice() {
-        return this.petrolPrice;
-    }    
-    
-    public void setPetrolPrice(double PetrolPrice) {
-        this.petrolPrice = PetrolPrice;
-    }
-    
-    public void setMinLevelPetrol(double minLevelPetrol) {
-        this.minPetrolLevel = minLevelPetrol;
-    }    
-    
-    public double getMinLevelPetrol() {
-        return this.minPetrolLevel;
-    }
-    
-    public double currentPetrolLevel() {
-        return this.currentPetrolLevel;
-    }
-    
-    public double availablePetrolLevel() {
-        return this.currentPetrolLevel - this.minPetrolLevel;
-    }
-    
-    public String petrolType() {
-        return this.petrolType;
     }
     
     public String formatPrice(double price) {
@@ -137,11 +139,11 @@ public class PetrolPump {
         
         return currencyFormatter.format(price);
     }
-    public void startPumping() {              
+    public void startFuelling() {
         //Show welcome message
         System.out.println("Welcome to Petrol Station 'Harakiri' at Groove Street, Los Angeles");
         //Show amount of petrol available before pump                
-        this.useSeparatorPrint();
+        this.printSeparator();
         System.out.println("Amount of " + this.petrolType + " petrol in a pump before fueling " + this.availablePetrolLevel());
         
         //Declare input variable
@@ -151,7 +153,7 @@ public class PetrolPump {
         while(fuelBuyAmount == 0) {      
             boolean checkAvailability = false;
             while(checkAvailability == false) {                     
-                this.useSeparatorPrint();
+                this.printSeparator();
                 System.out.print("Amount of " + this.petrolType + " petrol you wish to purchase: ");    
                 try {
                     fuelBuyAmount = Double.parseDouble(this.Input.next());

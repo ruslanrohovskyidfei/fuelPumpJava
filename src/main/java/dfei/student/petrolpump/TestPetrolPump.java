@@ -17,7 +17,7 @@ public class TestPetrolPump {
     }
     public void startTesting() {       
         //Running test
-        Pump.startPumping();
+        Pump.startFuelling();
         //Adding 1000L of Fuel
         Pump.addFuel(1000);
     }    
